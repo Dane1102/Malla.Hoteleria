@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Malla Curricular Hotelería</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fefefe;
+      color: #333;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .malla {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .periodo {
+      background-color: #fce4ec;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      min-width: 220px;
+    }
+    .periodo h2 {
+      font-size: 16px;
+      text-align: center;
+      color: #c2185b;
+    }
+    .materia {
+      background-color: #e3f2fd;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: 0.2s ease;
+    }
+    .materia.aprobada {
+      background-color: #c8e6c9;
+      text-decoration: line-through;
+    }
+    .materia.bloqueada {
+      background-color: #f8d7da;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .materia.bloqueada::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      background: #555;
+      color: #fff;
+      padding: 5px;
+      font-size: 12px;
+      border-radius: 4px;
+      top: 50%;
+      left: 105%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      display: none;
+      z-index: 10;
+    }
+    .materia.bloqueada:hover::after {
+      display: block;
+    }
+    button {
+      display: block;
+      margin: 30px auto;
+      background: #f48fb1;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Malla Curricular - Administración Hotelera</h1>
+  <div class="malla" id="malla"></div>
+  <button onclick="reiniciar()">Reiniciar progreso</button>
+
+  <script>
+    const materias = [
+      // Período 1
+      { id: "ELT-001", nombre: "Electiva I (Artes y Deportes)", periodo: "Período 1", prerequisitos: [] },
+      { id: "FIL-104", nombre: "Ética Formativa", periodo: "Período 1", prerequisitos: [] },
+      { id: "LEX-131", nombre: "Inglés Técnico I", periodo: "Período 1", prerequisitos: [] },
+      { id: "ATH-103", nombre: "Introducción al Turismo", periodo: "Período 1", prerequisitos: [] },
+      { id: "LET-101", nombre: "Lengua Española I", periodo: "Período 1", prerequisitos: [] },
+      { id: "MAT-060", nombre: "Matemática Básica", periodo: "Período 1", prerequisitos: [] },
+      { id: "ORI-100", nombre: "Orientación Universitaria", periodo: "Período 1", prerequisitos: [] },
+      { id: "ADM-105", nombre: "Principios de Administración", periodo: "Período 1", prerequisitos: [] },
+      { id: "EDU-107", nombre: "Técnicas de Estudio", periodo: "Período 1", prerequisitos: [] },
+
+      // Período 2
+      { id: "ADM-106", nombre: "Comportamiento Organizacional", periodo: "Período 2", prerequisitos: ["ADM-105"] },
+      { id: "ATH-127", nombre: "Ecoturismo", periodo: "Período 2", prerequisitos: ["ATH-103"] },
+      { id: "CON-116", nombre: "Fundamentos de Contabilidad", periodo: "Período 2", prerequisitos: ["MAT-060"] },
+      { id: "LEX-132", nombre: "Inglés Técnico II", periodo: "Período 2", prerequisitos: ["LEX-131"] },
+      { id: "LET-102", nombre: "Lengua Española II", periodo: "Período 2", prerequisitos: ["LET-101"] },
+      { id: "ADM-133", nombre: "Métodos Cuantitativos I", periodo: "Período 2", prerequisitos: ["MAT-060"] },
+      { id: "ATH-125", nombre: "Patrimonio Cultural I", periodo: "Período 2", prerequisitos: ["ATH-103"] },
+
+      // Período 3
+      { id: "ATH-257", nombre: "Ciencias de la Alimentación", periodo: "Período 3", prerequisitos: [] },
+      { id: "CON-117", nombre: "Contabilidad Financiera", periodo: "Período 3", prerequisitos: ["CON-116"] },
+      { id: "ATH-122", nombre: "Geografía Turística Mundial", periodo: "Período 3", prerequisitos: ["ATH-103"] },
+      { id: "HUM-160", nombre: "Historia Dominicana", periodo: "Período 3", prerequisitos: [] },
+      { id: "INF-200", nombre: "Informática Básica", periodo: "Período 3", prerequisitos: [] },
+      { id: "LEX-133", nombre: "Inglés Técnico III", periodo: "Período 3", prerequisitos: ["LEX-132"] },
+      { id: "SOC-100", nombre: "Introducción a la Sociología", periodo: "Período 3", prerequisitos: [] },
+      { id: "ATH-126", nombre: "Patrimonio Cultural II", periodo: "Período 3", prerequisitos: ["ATH-125"] },
+    
+      // Período 4
+      { id: "CON-118", nombre: "Contabilidad para Sociedades Comerciales", periodo: "Período 4", prerequisitos: ["CON-117"] },
+      { id: "ATH-200", nombre: "Estructura Hotelera", periodo: "Período 3", prerequisitos: ["CON-116"] },
+      { id: "ATH-210", nombre: "Gastronomia I", periodo: "Período 3", prerequisitos: ["ATH-103"] },
+      { id: "ATH-130", nombre: "Geografia Turistica Dominicana", periodo: "Período 3", prerequisitos: [] },
+      { id: "HUM-150", nombre: "Historia de la Cultura Universal", periodo: "Período 3", prerequisitos: [] },
+      { id: "LEX-134", nombre: "Inglés Técnico IV", periodo: "Período 3", prerequisitos: ["LEX-132"] },
+      { id: "ATH-211", nombre: "Laboratorio Gastronomia I", periodo: "Período 3", prerequisitos: [] },
+   ];
+
+    const estado = JSON.parse(localStorage.getItem("estadoMaterias")) || {};
+
+    function guardarEstado() {
+      localStorage.setItem("estadoMaterias", JSON.stringify(estado));
+    }
+
+    function crearMalla() {
+      const contenedor = document.getElementById("malla");
+      contenedor.innerHTML = "";
+
+      const periodos = [...new Set(materias.map(m => m.periodo))];
+
+      periodos.forEach(periodo => {
+        const columna = document.createElement("div");
+        columna.className = "periodo";
+        columna.innerHTML = `<h2>${periodo}</h2>`;
+
+        materias
+          .filter(m => m.periodo === periodo)
+          .forEach(materia => {
+            const div = document.createElement("div");
+            div.className = "materia";
+            div.textContent = materia.nombre;
+
+            const aprobada = estado[materia.id];
+            const requisitosCumplidos = materia.prerequisitos.every(id => estado[id]);
+
+            if (aprobada) {
+              div.classList.add("aprobada");
+            } else if (!requisitosCumplidos) {
+              div.classList.add("bloqueada");
+              const faltantes = materia.prerequisitos.filter(id => !estado[id]);
+              const nombres = faltantes.map(id => materias.find(m => m.id === id)?.nombre || id);
+              div.setAttribute("data-tooltip", "Faltan: " + nombres.join(", "));
+            }
+
+            div.addEventListener("click", () => {
+              if (div.classList.contains("bloqueada")) return;
+              estado[materia.id] = !estado[materia.id];
+              guardarEstado();
+              crearMalla();
+            });
+
+            columna.appendChild(div);
+          });
+
+        contenedor.appendChild(columna);
+      });
+    }
+
+    function reiniciar() {
+      if (confirm("¿Seguro que deseas borrar tu progreso?")) {
+        localStorage.removeItem("estadoMaterias");
+        location.reload();
+      }
+    }
+
+    crearMalla();
+  </script>
+</body>
+</html>
